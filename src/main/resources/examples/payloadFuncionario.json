@@ -1,0 +1,42 @@
+[
+  {
+    "name": "Carlos Souza",
+    "matricula": "F20240001",
+    "telefone": "(11) 98765-4321",
+    "cpf": "123.456.789-10",
+    "dataNascimento": "1985-07-21",
+    "cargo": "Coordenador"
+  },
+  {
+    "name": "Juliana Martins",
+    "matricula": "F20240002",
+    "telefone": "(21) 12345-6789",
+    "cpf": "234.567.890-11",
+    "dataNascimento": "1990-10-05",
+    "cargo": "Diretor"
+  },
+  {
+    "name": "Roberto Nascimento",
+    "matricula": "F20240003",
+    "telefone": "(31) 98765-1234",
+    "cpf": "345.678.901-12",
+    "dataNascimento": "1978-03-15",
+    "cargo": "Professor"
+  },
+  {
+    "name": "Ana Beatriz Lima",
+    "matricula": "F20240004",
+    "telefone": "(41) 56789-1234",
+    "cpf": "456.789.012-13",
+    "dataNascimento": "1983-12-22",
+    "cargo": "Professor"
+  },
+  {
+    "name": "Felipe Castro",
+    "matricula": "F20240005",
+    "telefone": "(51) 67890-4321",
+    "cpf": "567.890.123-14",
+    "dataNascimento": "1995-06-09",
+    "cargo": "Auxiliar de limpeza"
+  }
+]

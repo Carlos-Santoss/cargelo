@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_cf33452d_6f51_4ddb_9ebc_fa481abcc945_Input_Payload = Array<{  telefone: String,   name: String,   matricula: String,   nomeDoPai: String,   cpf: String,   dataNascimento: String,   nomeDaMae: String,   _?: Any}>
+

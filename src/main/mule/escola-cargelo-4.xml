@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd  http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+    <flow name="escola-cargelo-4-main">
+        <http:listener config-ref="escola-cargelo-4-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="escola-cargelo-4-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="escola-cargelo-4-console">
+        <http:listener config-ref="escola-cargelo-4-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="escola-cargelo-4-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="put:\aluno:application\json:escola-cargelo-4-config" doc:id="90208841-dd3f-4dbe-892e-89d0356f9433">
+        <ee:transform doc:name="Transform Message1" doc:id="6660426c-30f3-457d-80f1-409d68b23fe4">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <batch:job jobName="escola-cargelo-4Batch_Job1" doc:id="f727b33f-c373-49c9-b966-4520b0f642c5">
+            <batch:process-records>
+                <batch:step name="Batch_Step1" doc:id="5bfc73ae-9c0c-4775-89b1-319600209733">
+                    <db:update doc:name="Update" doc:id="50606e7e-ca59-492b-be00-6845c7edf914" config-ref="Database_Config">
+                        <db:sql><![CDATA[UPDATE aluno
+SET nome = :name, nomeDoPai = :nomeDoPai, nomeDaMae = :nomeDaMae, cpf = :cpf, dataNascimento = :dataNascimento
+WHERE matricula = :matricula;]]></db:sql>
+                        <db:input-parameters><![CDATA[#[{
+	name: payload.name,
+	nomeDoPai: payload.nomeDoPai,
+	nomeDaMae: payload.nomeDaMae,
+	dataNascimento: payload.dataNascimento,
+	cpf: payload.cpf,
+	matricula: payload.matricula
+}]]]></db:input-parameters>
+                    </db:update>
+                </batch:step>
+            </batch:process-records>
+            <batch:on-complete>
+                <logger level="INFO" doc:name="Logger" doc:id="e422810c-f4dc-47e5-b028-4fb546287fba" />
+            </batch:on-complete>
+        </batch:job>
+        <logger level="INFO" doc:name="Logger" doc:id="de2b7096-9bf4-4f05-98a3-a230745a2bd4" message="#[payload]" />
+        <ee:transform doc:name="Transform Message">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  code: 200,
+  message: "Dados atualizados com sucesso"
+} as Object {encoding: "UTF-8", mediaType: "application/json"}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="put:\funcionario:application\json:escola-cargelo-4-config" doc:id="f3772cbe-5dea-4260-a02e-046c49fa868f">
+        <ee:transform doc:name="Transform Message" doc:id="3a4fa7c6-8935-4352-ab2b-3b091d6d5816">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <batch:job jobName="escola-cargelo-4Batch_JobPutFuncionairo" doc:id="db6ba133-893c-4e56-85b7-e251eebcfefc">
+            <batch:process-records>
+                <batch:step name="Batch_Step" doc:id="c72e910a-2214-44ea-87ba-41785df0461b">
+                    <db:update doc:name="Update" doc:id="41d579a4-9e18-4205-b309-6e218e503976" config-ref="Database_Config">
+                        <db:sql><![CDATA[UPDATE funcionario
+SET name = :name, telefone = :telefone, cpf = :cpf, dataNascimento = :dataNascimento, cargo = :cargo
+WHERE matricula = :matricula;]]></db:sql>
+                        <db:input-parameters><![CDATA[#[{
+	name: payload.name,
+	telefone: payload.telefone,
+	cpf: payload.cpf,
+	dataNascimento: payload.dataNascimento,
+	cargo: payload.cargo,
+	matricula: payload.matricula
+}]]]></db:input-parameters>
+                    </db:update>
+                </batch:step>
+            </batch:process-records>
+            <batch:on-complete>
+                <logger level="INFO" doc:name="Logger" doc:id="8c6052a3-af04-4a4b-885b-21dc25c0ac46" message="#[payload]" />
+            </batch:on-complete>
+        </batch:job>
+        <logger level="INFO" doc:name="Logger" doc:id="95485847-f0d7-45dc-816f-8675edce4299" message="#[payload]" />
+    </flow>
+    <flow name="delete:\aluno:application\json:escola-cargelo-4-config" doc:id="cf33452d-6f51-4ddb-9ebc-fa481abcc945">
+        <ee:transform doc:name="Transform Message1" doc:id="10b07bff-d862-4bf1-899e-c90f7ce5eccb">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <batch:job jobName="escola-cargelo-4Batch_JobDelete" doc:id="c1e4c39e-2f68-4cbc-9cf8-e3d8e06590bb">
+            <batch:process-records>
+                <batch:step name="Batch_Step" doc:id="a0c4b10e-d305-4a8f-87c0-d9bdca8c2f42">
+                    <db:delete doc:name="Delete" doc:id="aeea393a-7a62-45a7-a149-0db5b42e6ccb" config-ref="Database_Config">
+                        <db:sql><![CDATA[DELETE FROM aluno  WHERE matricula = :matricula;]]></db:sql>
+                        <db:input-parameters><![CDATA[#[{
+	matricula: payload.matricula
+}]]]></db:input-parameters>
+                    </db:delete>
+                </batch:step>
+            </batch:process-records>
+        </batch:job>
+        <logger level="INFO" doc:name="Logger" doc:id="78765a7a-0ff9-484a-bdf1-a1eae8b4b990" message="#[payload]" />
+    </flow>
+    <flow name="delete:\funcionario:application\json:escola-cargelo-4-config" doc:id="3d674449-4738-413a-97a7-9a38181baa75">
+        <ee:transform doc:name="Transform Message">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <batch:job jobName="escola-cargelo-4Batch_Job2" doc:id="dfec671d-08d5-4d11-b742-9e83a1f1b0d7">
+            <batch:process-records>
+                <batch:step name="Batch_Step2" doc:id="f76be82e-9c9f-48a1-ac59-52296fa29c8b">
+                    <db:delete doc:name="Delete" doc:id="8a956046-3d95-4493-9374-10b88d0fd628" config-ref="Database_Config">
+                        <db:sql><![CDATA[DELETE FROM funcionario WHERE matricula = :matricula;]]></db:sql>
+                        <db:input-parameters><![CDATA[#[{
+	matricula: payload.matricula
+}]]]></db:input-parameters>
+                    </db:delete>
+                </batch:step>
+            </batch:process-records>
+            <batch:on-complete>
+                <logger level="INFO" doc:name="Logger" doc:id="c56628bc-0fcb-4b39-8261-2799fd0d142c" message="#[payload]" />
+            </batch:on-complete>
+        </batch:job>
+        <logger level="INFO" doc:name="Logger" doc:id="3aa888f9-64c5-4d32-a3bb-c135fb4c8a48" message="#[payload]" />
+    </flow>
+    <flow name="get:\aluno:application\json:escola-cargelo-4-config" doc:id="752a5ad4-0283-4811-a385-f969ded90c64">
+        <db:select doc:name="Select" doc:id="829b62c0-a4e6-4185-b935-241b1aa6284a" config-ref="Database_Config">
+            <db:sql><![CDATA[select * from aluno]]></db:sql>
+        </db:select>
+    </flow>
+    <flow name="get:\funcionario:application\json:escola-cargelo-4-config" doc:id="cf8d2c08-0e9e-4e86-9057-758cd8683623">
+        <db:select doc:name="Select" doc:id="ffc0267b-d21f-4c90-8f24-ac7178979996" config-ref="Database_Config">
+            <db:sql><![CDATA[select * from funcionario]]></db:sql>
+        </db:select>
+    </flow>
+    <flow name="post:\aluno:application\json:escola-cargelo-4-config" doc:id="f193c9e0-a48c-4664-a377-324d7fb7228e">
+        <ee:transform doc:name="Transform Message">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <batch:job jobName="escola-cargelo-4Batch_Job" doc:id="72f4ee94-2c95-450b-ac9d-c1111ad5116a">
+            <batch:process-records>
+                <batch:step name="Batch_Step" doc:id="0324e318-4f06-4a88-8a0a-fa05ff451cee">
+                    <db:insert doc:name="Insert" doc:id="0efa9d4c-027e-4beb-b0f6-5fb24f351b7f" config-ref="Database_Config">
+                        <db:sql><![CDATA[INSERT INTO aluno( nome , nomeDoPai, nomeDaMae, dataNascimento, cpf) VALUES (:name, :nomeDoPai, :nomeDaMae, :dataNascimento, :cpf);]]></db:sql>
+                        <db:input-parameters><![CDATA[#[{
+	name: payload.name,
+	nomeDoPai: payload.nomeDoPai,
+	nomeDaMae: payload.nomeDaMae,
+	dataNascimento: payload.dataNascimento,
+	cpf: payload.cpf
+}]]]></db:input-parameters>
+                    </db:insert>
+                </batch:step>
+            </batch:process-records>
+            <batch:on-complete>
+                <logger level="INFO" doc:name="Logger" doc:id="98e7b26e-c3d7-40d8-85ab-341bba369749" message="#[payload]" />
+            </batch:on-complete>
+        </batch:job>
+    </flow>
+    <flow name="post:\funcionario:application\json:escola-cargelo-4-config" doc:id="2ae4bdaf-28f3-49dc-a4d8-57908e8788ae">
+        <ee:transform doc:name="Transform Message" doc:id="c3564406-3204-4aa1-9542-2b431cb04504">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <batch:job jobName="escola-cargelo-4Batch_JobPostFuncionairo" doc:id="6857f44f-4b8b-4341-ad21-a6e11df4ea87">
+            <batch:process-records>
+                <batch:step name="Batch_Step" doc:id="a412bdf6-1da2-49fe-b072-f3dd7607a37f">
+                    <db:insert doc:name="Insert" doc:id="571ef9c1-25de-4454-8dae-a697f84ba26f" config-ref="Database_Config">
+                        <db:sql><![CDATA[INSERT INTO funcionario(name, telefone, cpf, dataNascimento, cargo) VALUES(:nome, :telefone, :cpf, :dataNascimento, :cargo);]]></db:sql>
+                        <db:input-parameters><![CDATA[#[{
+	nome: payload.name,
+	telefone: payload.telefone,
+	cpf: payload.cpf,
+	dataNascimento: payload.dataNascimento,
+	cargo: payload.cargo
+}]]]></db:input-parameters>
+                    </db:insert>
+                </batch:step>
+            </batch:process-records>
+            <batch:on-complete>
+                <logger level="INFO" doc:name="Logger" doc:id="93eb332e-6538-479d-bf31-00c6c9872a86" message="#[payload]" />
+            </batch:on-complete>
+        </batch:job>
+    </flow>
+    <flow name="get:\aluno:escola-cargelo-4-config">
+        <ee:transform doc:name="Transform Message">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  code: 404,
+  message: "Dados nao encontrados"
+} as Object {encoding: "UTF-8", mediaType: "application/json"}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="get:\funcionario:escola-cargelo-4-config">
+        <ee:transform doc:name="Transform Message">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  code: 404,
+  message: "Dados nao encontrados"
+} as Object {encoding: "UTF-8", mediaType: "application/json"}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+</mule>

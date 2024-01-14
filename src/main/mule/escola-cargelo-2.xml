@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd 
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd">
+      <flow name="escola-cargelo-2-main">
+        <http:listener config-ref="escola-cargelo-2-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="escola-cargelo-2-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="escola-cargelo-2-console">
+        <http:listener config-ref="escola-cargelo-2-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="escola-cargelo-2-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="put:\aluno:application\json:escola-cargelo-2-config" doc:id="04f8d019-77b2-4af3-b9f5-5d8ee2770ff4">
+        <ee:transform doc:name="Transform Message">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload map(result, index) -> {
+	name: result.name,
+	nomeDoPai: result.nomeDoPai,
+	nomeDaMae: result.nomeDaMae,
+	dataNascimento: result.dataNascimento,
+	cpf: result.cpf,
+	matricula: result.matricula
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+		<flow-ref doc:name="Flow Reference" doc:id="14fad864-8b03-4c78-a37d-a0a04ba8358d" name="put:\aluno:application\json:escola-cargelo-4-config"/>
+    </flow>
+    <flow name="put:\funcionario:application\json:escola-cargelo-2-config" doc:id="aad65431-e9df-4e97-877c-5b4546271f60">
+		<ee:transform doc:name="Transform Message" doc:id="de6a31ba-a52f-4c5c-b2e8-89654c7a43d0" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map(result, index) -> {
+	name: result.name,
+	telefone: result.telefone,
+	dataNascimento: result.dataNascimento,
+	cpf: result.cpf,
+	matricula: result.matricula,
+	cargo: result.cargo
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<flow-ref doc:name="Flow Reference" doc:id="37a91983-4b38-4607-88a9-9e741ccf3b95" name="put:\funcionario:application\json:escola-cargelo-4-config"/>
+    </flow>
+    <flow name="delete:\aluno:application\json:escola-cargelo-2-config" doc:id="61ba5ffd-8641-401f-82ec-a4e1d1d2d994">
+		<ee:transform doc:name="Transform Message" doc:id="5dfb0d74-7af6-416e-a036-f30e06444644" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map(result, index) -> {
+	name: result.name,
+	nomeDoPai: result.nomeDoPai,
+	nomeDaMae: result.nomeDaMae,
+	dataNascimento: result.dataNascimento,
+	cpf: result.cpf,
+	matricula: result.matricula
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<flow-ref doc:name="Flow Reference" doc:id="33240b74-ba15-4072-b319-9adfa60c0f96" name="delete:\aluno:application\json:escola-cargelo-4-config"/>
+    </flow>
+    <flow name="delete:\funcionario:application\json:escola-cargelo-2-config" doc:id="cd322235-ad35-464b-86ac-f412670e84b3">
+        <ee:transform doc:name="Transform Message">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload map(result, index) -> {
+	name: result.name,
+	telefone: result.telefone,
+	dataNascimento: result.dataNascimento,
+	cpf: result.cpf,
+	matricula: result.matricula
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+		<flow-ref doc:name="Flow Reference" doc:id="58058c8a-2292-4fa8-8f83-ccdc2eae13c3" name="delete:\funcionario:application\json:escola-cargelo-4-config"/>
+    </flow>
+    <flow name="get:\aluno:application\json:escola-cargelo-2-config" doc:id="a4fe5d30-c16c-443e-8e4d-bc0e88e9f519">
+		<flow-ref doc:name="Flow Reference" doc:id="1ff090c1-0e7c-47be-a9ff-a3390215a0dc" name="get:\aluno:application\json:escola-cargelo-4-config"/>
+		<ee:transform doc:name="Transform Message">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload map(result, index) -> {
+	name: result.nome,
+	nomeDoPai: result.nomeDoPai,
+	nomeDaMae: result.nomeDaMae,
+	dataNascimento: result.dataNascimento,
+	cpf: result.cpf,
+	matricula: result.matricula
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="509407db-6293-476c-94dd-ff3e803bb790" message="payload"/>
+    </flow>
+    <flow name="get:\funcionario:application\json:escola-cargelo-2-config" doc:id="f02ce0ff-10c7-4739-885c-ab5610eb6edc">
+        <flow-ref doc:name="Flow Reference" doc:id="d433e664-2b61-4ca2-94ed-bf779dddeb0d" name="get:\funcionario:application\json:escola-cargelo-4-config"/>
+		<ee:transform doc:name="Transform Message" doc:id="9f7c8e0f-8768-4705-8baf-96a7b3778e05" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map(result, index) -> {
+	name: result.name,
+	telefone: result.telefone,
+	dataNascimento: result.dataNascimento,
+	cpf: result.cpf,
+	matricula: result.matricula
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="02c1747d-58f7-4e9f-863d-4800cebd2360" message="#[payload]"/>
+    </flow>
+    <flow name="post:\aluno:application\json:escola-cargelo-2-config" doc:id="b779500a-0b92-4433-9993-af36a5242904">
+		<ee:transform doc:name="mapping payload" doc:id="04c27d73-3f35-4212-96cd-0517b14829f6">
+			<ee:message>
+				<ee:set-payload resource="payloadPost.dwl" />
+			</ee:message>
+			<ee:variables />
+		</ee:transform>
+		<flow-ref doc:name="Flow Reference" doc:id="cd440759-51b4-4a1b-b44b-901740002439" name="post:\aluno:application\json:escola-cargelo-4-config"/>
+		<ee:transform doc:name="Transform Message">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  code: 201,
+  message: "Aluno(s) inserido(s) com sucesso!"
+} as Object {encoding: "UTF-8", mediaType: "application/json"}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="post:\funcionario:application\json:escola-cargelo-2-config" doc:id="94afa905-af22-4802-9dd8-b03ff734f3a4">
+        <ee:transform doc:name="Transform Message" doc:id="582935ea-e6b5-4371-9f87-18a382bb88ed">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload map(result, index) -> {
+	name: result.name,
+	telefone: result.telefone,
+	dataNascimento: result.dataNascimento,
+	cpf: result.cpf,
+	matricula: result.matricula
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+		<flow-ref doc:name="Flow Reference" doc:id="fa3b3d79-b871-4068-93bc-014beed6a227" name="post:\funcionario:application\json:escola-cargelo-4-config"/>
+    </flow>
+</mule>

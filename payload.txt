@@ -1,0 +1,9 @@
+{
+    "name": "Mariana Costa",
+    "matricula": "20240014",
+    "nomeDoPai": "Francisco Costa",
+    "nomeDaMae": "Teresa Costa",
+    "telefone": "(41) 66666-6666",
+    "cpf": "555.666.777-88",
+    "dataNascimento": "2003-04-25"
+ }

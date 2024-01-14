@@ -1,0 +1,13 @@
+%dw 2.0
+
+type auto_a4fe5d30_c16c_443e_8e4d_bc0e88e9f519_Output_Payload = {
+  telefone: String, 
+  name: String, 
+  matricula: String, 
+  nomeDoPai: String, 
+  cpf: String, 
+  dataNascimento: String, 
+  nomeDaMae: String, 
+  _?: Any
+}
+
