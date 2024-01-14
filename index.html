@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Formulário de Cadastro</title>
+    <script>
+        function enviarFormulario(event) {
+            event.preventDefault(); // Impede a submissão padrão do formulário
+
+            var formData = {
+                name: document.getElementById('name').value,
+                nomeDoPai: document.getElementById('nomeDoPai').value,
+                nomeDaMae: document.getElementById('nomeDaMae').value,
+                cpf: document.getElementById('cpf').value,
+                telefone: document.getElementById('telefone').value,
+                dataNascimento: document.getElementById('dataNascimento').value,
+                matricula: document.getElementById('matricula').value
+            };
+
+            var arrayFormData = converterParaArray(formData);
+
+            fetch('http://localhost:8081/api/aluno', {
+                method: 'POST',
+				 mode: 'no-cors', 
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(arrayFormData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert(JSON.stringify(data, null, 2)); // Exibe os dados em um alerta
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Falha ao enviar: ' + error.message);
+            });
+        }
+
+        function converterParaArray(data) {
+            var arrayResultante = [];
+            for (var chave in data) {
+                if (data.hasOwnProperty(chave)) {
+                    arrayResultante.push({ key: chave, value: data[chave] });
+                }
+            }
+            return arrayResultante;
+        }
+    </script>
+</head>
+<body>
+
+<h2>Formulário de Cadastro</h2>
+
+<form onsubmit="enviarFormulario(event)">
+    <label for="name">Nome:</label><br>
+    <input type="text" id="name" name="name" required><br>
+
+    <label for="nomeDoPai">Nome do Pai:</label><br>
+    <input type="text" id="nomeDoPai" name="nomeDoPai" required><br>
+
+    <label for="nomeDaMae">Nome da Mãe:</label><br>
+    <input type="text" id="nomeDaMae" name="nomeDaMae" required><br>
+
+    <label for="cpf">CPF:</label><br>
+    <input type="text" id="cpf" name="cpf" required><br>
+
+    <label for="telefone">Telefone:</label><br>
+    <input type="tel" id="telefone" name="telefone" required><br>
+
+    <label for="dataNascimento">Data de Nascimento:</label><br>
+    <input type="text" id="dataNascimento" name="dataNascimento" required><br>
+
+    <label for="matricula">Matrícula:</label><br>
+    <input type="text" id="matricula" name="matricula" required><br><br>
+
+    <input type="submit" value="Enviar">
+</form> 
+
+</body>
+</html>
